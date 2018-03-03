@@ -3,6 +3,18 @@
 	padding: 20px 12px 10px 20px;
 	font: 13px Arial, Helvetica, sans-serif;
 }
+.comments {
+	blockquote {
+		> h1 {
+			@include font-size(20);
+		}
+
+		> p {
+			@include font-size(18);
+			font-style: normal;
+		}
+	}
+}
 .comments-heading{
 	font-weight: bold;
 	font-style: italic;
