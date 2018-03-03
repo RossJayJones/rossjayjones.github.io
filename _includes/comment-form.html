@@ -1,0 +1,20 @@
+<article class="hentry">
+	<header class="header-title">
+		<div class="header-title-wrap">
+			<h1 class="entry-title">Leave a comment</h1>
+		</div><!-- /.header-title-wrap -->
+	</header>
+	<div class="entry-content">
+		<div class="comments">
+			<form method="POST" action="https://api.staticman.net/v2/entry/RossJayJones/rossjayjones.github.io/master/comments">
+				<input name="options[redirect]" type="hidden" value="{{ site.url }}/">
+				<!-- e.g. "2016-01-02-this-is-a-post" -->
+				<input name="options[slug]" type="hidden" value="{{ page.slug }}">
+				<label><span>Name</span></span><input class="input-field" name="fields[name]" type="text"></label>
+				<label><span>E-mail</span><input class="input-field" name="fields[email]" type="email"></label>
+				<label><span>Message</span><textarea class="textarea-field" name="fields[message]"></textarea></label>
+				<label><span>&nbsp;</span><input type="submit" value="Post" /></label>
+			</form>
+		</div>
+	</div><!-- /.entry-content -->
+</article>
