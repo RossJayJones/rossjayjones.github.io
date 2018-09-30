@@ -356,6 +356,6 @@ public class ContainsValidItemsAttribute : CustomValidationBaseAttribute
 
 ## Conclusion
 
-We had to jump through a number of hoops to get this right and it feels like it should have been easier. Being required to create the validation context asynchronously is what threw the spanner in the works for us. If know of a simpler solution to this problem I would love to hear from you!
+We had to jump through a number of hoops to get this right and it feels like it should have been easier. Being required to create the validation context asynchronously is what threw the spanner in the works for us. If you know of a simpler solution to this problem I would love to hear from you!
 
 Here is a [gift](https://www.youtube.com/channel/UCcXhhVwCT6_WqjkEniejRJQ){:target="_blank"} for reading all the way to the end.
