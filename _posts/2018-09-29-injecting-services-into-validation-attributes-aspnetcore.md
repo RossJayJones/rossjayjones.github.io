@@ -4,7 +4,7 @@ title:  "Injecting services & data into validation attributes with AspNetCore 2.
 date:   2018-09-09 09:00:00 +0200
 categories: dotnetcore aspnetcore mvc dotnet
 image:
-  feature: header.jpg
+  feature: angry-annoyed-cafe-52608.jpg
 ---
 
 How to asynchronously provided data to validation attributes in AspNetCore 2.1
