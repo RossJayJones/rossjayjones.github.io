@@ -3,6 +3,8 @@ layout: post
 title:  "Resource Scheduling Apps with RavenDB 4.0"
 date:   2018-03-03 13:00:00 +0200
 categories: document_databases architecture dotnet
+image:
+  feature: time.jpg
 ---
 
 I was recently tasked with building resource scheduling functionality into a system which uses a document database as the back end store.

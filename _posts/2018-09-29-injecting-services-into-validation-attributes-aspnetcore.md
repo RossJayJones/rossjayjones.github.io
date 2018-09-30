@@ -6,9 +6,6 @@ categories: dotnetcore aspnetcore mvc dotnet
 image:
   feature: angry-annoyed-cafe-52608.jpg
 ---
-
-How to asynchronously provided data to validation attributes in AspNetCore 2.1
-
 TLDR; [source code available on github](https://github.com/RossJayJones/dotnetcore-validation-injection){:target="_blank"}
 
 We came across a situation where we needed some additional data to perform validation on the payload being sent via an HTTP post. Essentially it involved calling up some setup rules from a database and comparing the payload passed in against those rules to ensure the payload was valid. We had the following requirements:
