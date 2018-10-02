@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <url>
+    <loc>https://rossjayjones.github.io/</loc>
+    <lastmod>2018-09-30T10:00:51+00:00</lastmod>
+    <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>https://rossjayjones.github.io/about/</loc>
+    <lastmod>2018-09-30T10:00:51+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://rossjayjones.github.io/dotnetcore/aspnetcore/mvc/dotnet/2018/09/09/injecting-services-into-validation-attributes-aspnetcore.html</loc>
+    <lastmod>2018-09-30T10:00:51+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://rossjayjones.github.io/document_databases/architecture/dotnet/2018/03/03/resource-scheduling-apps-with-ravendb.html</loc>
+    <lastmod>2018-09-30T10:00:51+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+</urlset>
