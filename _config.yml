@@ -16,10 +16,10 @@
 title: Ross Jay Jones
 email: ross@appworks.co.za
 description: >- # this means to ignore newlines until "baseurl:"
-  Thoughts on software architecture and programming
+  Software developer
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: rossjayjones
+url: "https://http://rossjayjones.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+twitter_username: ross_jay_jones
 github_username:  rossjayjones
 
 # Build settings
