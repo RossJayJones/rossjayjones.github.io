@@ -18,7 +18,7 @@ email: ross@appworks.co.za
 description: >- # this means to ignore newlines until "baseurl:"
   Software developer
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://http://rossjayjones.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://rossjayjones.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: ross_jay_jones
 github_username:  rossjayjones
 
