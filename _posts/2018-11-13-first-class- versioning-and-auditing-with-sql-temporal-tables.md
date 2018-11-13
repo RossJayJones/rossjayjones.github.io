@@ -2,7 +2,7 @@
 layout: post
 title:  "Versioning & Auditing with SQL Server Temporal Tables and .Net Core"
 date:   2018-11-13 09:00:00 +0200
-categories: dotnetcore aspnetcore mvc dotnet sql
+categories: dotnetcore
 image:
   feature: jorgen-haland-781448-unsplash.jpg
 ---
