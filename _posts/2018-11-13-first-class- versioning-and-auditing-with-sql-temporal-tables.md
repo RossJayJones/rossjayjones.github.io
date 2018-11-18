@@ -8,7 +8,7 @@ image:
 ---
 TLDR; [source code available on github][14]{:target="_blank"}
 
-Implementing versioning and audit trails within an application are one of those requirements which crop up over and over again, particularly in enterprise development. At its core a versioning and audit trail solutions require the retrieval of the state of an application data for a specific point in time.
+Implementing versioning and audit trails within an application are one of those requirements which crop up over and over again, particularly in enterprise development. At its core versioning and audit trail solutions require the retrieval of the state of an application data for a specific point in time.
 
 This is a hard problem to solve and is difficult at a number of levels. The first is that the technical solution required for implementing point in time snapshots is complex and requires a lot of experience to implement well. Secondly it is difficult because it often obfuscates our nice clean business model which we are trying to build.
 
