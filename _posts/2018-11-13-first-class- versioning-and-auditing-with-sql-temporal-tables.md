@@ -52,7 +52,7 @@ A version would typically be a first class concern of your business domain and n
 
 ### The Git Analogy
 
-As a developer you are likely familiar with Git source control. Git is, at its core, a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
+As a developer you are likely familiar with Git source control. Git, at its core, is a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
 
 You can think of a Git tag or release as a version. You can drop a marker at a specific point in time with a meaningful name. In the software development domain this would typically be a value such as `1.0.0`. This value can be used to communicate which version of the software your customers are using and help you control the roll out of updates to your software.
 
