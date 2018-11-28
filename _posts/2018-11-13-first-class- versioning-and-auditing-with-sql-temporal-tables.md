@@ -30,8 +30,6 @@ Unfortunately the solution requires a little more upfront though to be truly use
 
 As frustrating as that answer is, sometimes it is the correct one. For the remainder of this post I will introduce [SQL Temporal Tables][13]{:target="_blank"} which is fantastic technical solution for solving the problem at the storage level. More importantly I will explain how to make these concepts first class concerns within your application using [CQRS][10]{:target="_blank"} and Domain [Driven Design][11]{:target="_blank"} which will provide the rich functionality that the business expects.
 
-Before we begin let's take a closer look at audit trails and versioning to see how they are different from each other.
-
 ### The Git Analogy
 
 Before we begin I just want to talk about a very good auditing and versioning system which as a developer you likely use everyday, and will hopefully solidify the concepts in your mind. Git, at its core, is a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
