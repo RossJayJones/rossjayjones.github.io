@@ -8,51 +8,33 @@ image:
 ---
 TLDR; [source code available on github][14]{:target="_blank"}
 
-## Introduction
+Implementing versioning and audit trails within an application are one of those requirements which crop up over and over again, particularly in enterprise development. I work for OUTsurance in the insurance industry where reliable and accurate audit logs and version control are crucial.
 
-Implementing versioning and audit trails within an application are one of those requirements which crop up over and over again, particularly in enterprise development. At its core, versioning and audit trail solutions require the retrieval of the state of application data at a specific point in time (i.e. point in time snapshot).
+The point of an audit log is to record changes to data so you can see who made the change, what was changed, when it was changed and in the best case why was it changed. In insurance for example updating details about the security devices installed in your vehicle could have an effect on the premiums you pay every month. Therefore it is important to record these change so there is a clear record of when and why that data was changed should there be an enquiry down the line.
 
-I work in the insurance industry where reliable and accurate audit logs and version control are crucial. There is a fine balance between fine grained audit trails, technical efficiency and maintainability of the code base.
+Versioning is used to snapshot your data at a specific point in time such that each version can be referred to independently. For example there have been multiple versions of this blog post. There were a couple of drafts and ultimately a final version. When I shared this post with friends and colleagues it was useful to know which version they were looking at so I could consolidate the feedback effectively.
 
-In this post we are going to dive into how SQL temporal tables can be used to build an audit trail and versioning solution.
+At its core, versioning and audit trail solutions require the retrieval of data at a specific point in time (i.e. a point in time snapshot). This is the building block which a versioning and audit trail solution can be built from. In this post we are going to dive into how SQL temporal tables can be used to build such a solution.
 
 ## The Problem Space
 
-This is a hard problem to solve and is difficult on a number of levels. The first is that the technical solution required for implementing point in time snapshots is complex and requires a lot of experience to implement well. Secondly it is difficult because it often obfuscates our nice clean business model which we are trying to build.
+This is a hard problem to solve. The technical solution required for implementing point in time snapshots is complex and requires a lot of time and experience to implement well.
 
-Typically I see the wheels falls off when the solution is implemented at the wrong level of abstraction. If we are too fine grained the solution pollutes the business model and becomes a mess i.e. the infamous `INotifyPropertyChanged` interface. If we are too course we miss some of the richness required by the business or the solution becomes inefficient at a technical level.
+If your implementation is too fined grained you land up with a complex technical solution where your code is polluted with details associated with tracking changes on individual properties. i.e. the infamous `INotifyPropertyChanged` interface.
+
+If your implementation is too coarse you risk sacrificing system efficiency. For example you may be tempted to just serialize your entire object graph and store that as a JSON dump for every change which is made.
 
 Because it is difficult, and is often seen as a non functional requirement, we defer the implementation of these requirements until it is too late. The result is that we land up with a very technical solution which lacks the rich behaviour that the business requires. In the worst case we use software logging tools as an audit trail... you should be ashamed of yourselves :D
 
-If you ask a product owner or domain expert about it, they will likely tell you that it is important. When asked what specifically should be audited/versioned the answer is well... _everything_.
+Unfortunately the solution requires a little more upfront though to be truly useful. If you ask a product owner or domain expert about it, they will likely tell you that it is important. When asked what specifically should be audited/versioned the answer is well... _everything_.
 
 As frustrating as that answer is, sometimes it is the correct one. For the remainder of this post I will introduce [SQL Temporal Tables][13]{:target="_blank"} which is fantastic technical solution for solving the problem at the storage level. More importantly I will explain how to make these concepts first class concerns within your application using [CQRS][10]{:target="_blank"} and Domain [Driven Design][11]{:target="_blank"} which will provide the rich functionality that the business expects.
 
 Before we begin let's take a closer look at audit trails and versioning to see how they are different from each other.
 
-### Audit Trails
-
-According to a quick [google][1]{:target="_blank"} search
-
-> An audit trail (also called audit log) is a security-relevant chronological record, set of records, and/or destination and source of records that provide documentary evidence of the sequence of activities that have affected a specific operation, procedure, or event at any time.
-
-For our purposes this typically means that when something changes we want to record who made the change, what was changed and when was it changed.
-
-This information is most useful when things have gone wrong and an _audit_ needs to be performed to determine where the problem lies. In business terms this means we may need to investigate a customer dispute, an incident of fraud or some other kind of security breach. At a technical level a good audit trail can go a long way to assist in identifying software bugs.
-
-Since audits are most useful when things are going wrong it typically means that they are not looked at until the problem has already occured. When this happens it is helpful to have as much information as possible so that the issue can be effectively diagnosed. The best case scenario is if you have audited _everything_.
-
-A good audit trail could also be used to try and identify problems automatically.
-
-### Versioning
-
-[Versioning][2]{:target="_blank"} on the other hand is subtly different. Versioning in the context of data would be to put a stake in the ground at a specific point in time. You can then retrieve data at a specific point using a version number. 
-
-A version would typically be a first class concern of your business domain and not all domain models require this. In the insurance space good versioning is critical to the day to day processes within the business.
-
 ### The Git Analogy
 
-As a developer you are likely familiar with Git source control. Git, at its core, is a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
+Before we begin I just want to talk about a very good auditing and versioning system which as a developer you likely use everyday, and will hopefully solidify the concepts in your mind. Git, at its core, is a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
 
 You can think of a Git tag or release as a version. You can drop a marker at a specific point in time with a meaningful name. In the software development domain this would typically be a value such as `1.0.0`. This value can be used to communicate which version of the software your customers are using and help you control the roll out of updates to your software.
 
