@@ -95,13 +95,11 @@ For the sample we have implemented CQRS by having the write model work against t
 
 In our versioning and auditing context the heavy lifting will be done by the queries since they must be aware of the SQL temporal table features. For our write model we rely entirely on the storage engine to do the work and it frees us from needing to know anything about temporal tables.
 
-The second concept I need to share some thoughts on is Domain Driven Design ([DDD][11]{:target="_blank"}). DDD is essentially a way of thinking about the design of your system. It provides strategic and tactical patterns which you can use to build a software domain model. A full breakdown is outside the scope of this post, however we need to discuss the concept of an Aggregate which will help us solve the versioning and auditing problem.
+The second concept I need to highlight is Domain Driven Design ([DDD][11]{:target="_blank"}). DDD is essentially a way of thinking about the design of your system. It provides strategic and tactical patterns which you can use to build a software domain model. A full breakdown is outside the scope of this post, however we need to discuss the concept of an Aggregate which will help us solve the versioning and auditing problem.
 
 > A DDD aggregate is a cluster of domain objects that can be treated as a single unit. An example may be an order and its line-items. These will be separate objects, but it's useful to treat the order (together with its line items) as a single aggregate. - [Fowler][11]{:target="_blank"}
 
 This is important in our context because we will be versioning and auditing the aggregate i.e. if any object within the aggregate changes, an audit will be created for the aggregate. When a new version is created it will be for the aggregate as a whole.
-
-## Implementation with SQL Temporal Tables
 
 ### The Write Model
 
