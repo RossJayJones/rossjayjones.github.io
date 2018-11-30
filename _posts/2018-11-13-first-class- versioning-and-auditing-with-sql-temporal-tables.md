@@ -300,7 +300,7 @@ public class Version
 }
 {% endhighlight %}
 
-### Introduction to SQL Temporal Tables
+### Configuring SQL Temporal Tables
 
 Up until this point we have done nothing out of the ordinary and have only used vanilla entity framework core. The magic comes in with SQL temporal tables.
 
