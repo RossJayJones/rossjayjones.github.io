@@ -32,7 +32,9 @@ As frustrating as that answer is, sometimes it is the correct one. For the remai
 
 ### The Git Analogy
 
-Before we begin I just want to talk about a very good auditing and versioning system which as a developer you likely use everyday, and will hopefully solidify the concepts in your mind. Git, at its core, is a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
+Before we begin I just want to talk about a very good auditing and versioning system which as a developer you likely use everyday, and will hopefully solidify the concepts in your mind. 
+
+Git, at its core, is a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
 
 You can think of a Git tag or release as a version. You can drop a marker at a specific point in time with a meaningful name. In the software development domain this would typically be a value such as `1.0.0`. This value can be used to communicate which version of the software your customers are using and help you control the roll out of updates to your software.
 
@@ -66,24 +68,24 @@ We are going to build an AspNetCore REST API which will support the above. I am 
 
 ## The Solution Space
 
-Now that we have a better understanding of what audit trails and versioning are, let's dive into the technical solution. We will approach the solution from two aspects:
+We will approach the solution from two aspects:
 
 * We need a solid and unobtrusive technical solution to provide point in time snapshot capabilities
 * We need versioning and audit trails to be a first class citizen of our domain model. This is to allow us to interact with the audits and versions from within our domain model.
 
 ### Point in time snapshots
 
-There are two solutions to point in time snapshots that I would like to highlight.
+There are two solutions to point in time snapshots problem which require a mention.
 
 1. Snapshot ([Memento][3]{:target="_blank"}) - An obvious solution would be to take a snapshot of the application state before a change is applied. If implemented naively the snapshots become large and impractical to work with. An obvious optimisation would be to only create a snapshot for the portion of the application state which has changed. This is how [git][6]{:target="_blank"} works under the hood. Rolling a custom solution to achieve this can be challenging and should not be implemented within your business logic but rather be left to infrastructure to solve.
 
 2. [Event Sourcing][4]{:target="_blank"} - Event Sourcing is an approach to storing state as a series of events. State is restored by replaying events in the order they occurred to materialize the latest state. To restore data to specific point in time you replay the events up to that point in time. Event sourcing requires a big shift in the way applications are built since events are at the core of the business data model. While this is a very powerful and relevant solution for some domains the facts are that it introduces complexity which feels unnecessary to most of us. Typically, solutions like this will work best with purpose-built infrastructure components such as [EventStore][5]{:target="_blank"}.
 
-For this post I have chosen the more traditional approach using snapshots powered by [SQL temporal tables][7]{:target="_blank"}. This is a fantastic SQL feature which packs away the technical complexity so we can focus on the business problem.
+[SQL temporal tables][7]{:target="_blank"} uses snapshots at the row level. When a row is updated a snapshot of the row is copied over to the associated history table. This gives us snapshot granularity at the row level which will be suitable for most use cases.
 
 ### CQRS and Domain Driven Design (DDD)
 
-Before we dive into the implementation details I want to share some thoughts on Command Query Responsibility Segregation ([CQRS][10]{:target="_blank"}).
+In the sample we will be using the Command Query Responsibility Segregation ([CQRS][10]{:target="_blank"}) pattern.
 
 While the term is a mouthful, the concept is simple. Our system will be split into two separate software models. One for the write side (commands) and another for the read side (queries).
 
@@ -385,9 +387,9 @@ The SQL query to retrieve the customer for a specific audit id would appear as f
 
 {% highlight SQL %}
 DECLARE @Timestamp DATETIME;
-SELECT 
+SELECT
     @Timestamp = [Timestamp]
-FROM 
+FROM
   [Audit]
 WHERE
   [Id] = @AuditId;
