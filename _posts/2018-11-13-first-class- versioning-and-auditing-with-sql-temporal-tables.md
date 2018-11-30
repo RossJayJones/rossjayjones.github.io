@@ -10,7 +10,7 @@ TLDR; [source code available on github][14]{:target="_blank"}
 
 Implementing versioning and audit trails within an application are one of those requirements which crop up over and over again, particularly in enterprise development. I work for OUTsurance in the insurance industry where reliable and accurate audit logs and version control are crucial.
 
-The point of an audit log is to record changes to data so you can see who made the change, what was changed, when it was changed and in the best case why was it changed. In insurance for example updating details about the security devices installed in your vehicle could have an effect on the premiums you pay every month. Therefore it is important to record these change so there is a clear record of when and why that data was changed should there be an enquiry down the line.
+The point of an audit log is to record changes to data so you can see who made the change, what was changed, when it was changed and in the best case why it was changed. In insurance for example updating details about the security devices installed in your vehicle could have an effect on the premiums you pay every month. Therefore it is important to record these change so there is a clear record of when and why that data was changed should there be an enquiry down the line.
 
 Versioning is used to snapshot your data at a specific point in time such that each version can be referred to independently. For example there have been multiple versions of this blog post. There were a couple of drafts and ultimately a final version. When I shared this post with friends and colleagues it was useful to know which version they were looking at so I could consolidate the feedback effectively.
 
@@ -71,7 +71,7 @@ We are going to build an AspNetCore REST API which will support the above. I am 
 We will approach the solution from two aspects:
 
 * We need a solid and unobtrusive technical solution to provide point in time snapshot capabilities
-* We need versioning and audit trails to be a first class citizen of our domain model. This is to allow us to interact with the audits and versions from within our domain model.
+* We need versioning and audit trails to be a first class citizen of our domain model. This is to allow us to interact with the audits and versions effectively.
 
 ### Point in time snapshots
 
@@ -90,10 +90,6 @@ In the sample we will be using the Command Query Responsibility Segregation ([CQ
 While the term is a mouthful, the concept is simple. Our system will be split into two separate software models. One for the write side (commands) and another for the read side (queries).
 
 In practical terms this means that we have a set of classes that we use for writes, and we have another set of classes which we use for reads.
-
-> I find that when talking about CQRS there is always some confusion around what the write model is. It does not necessarily mean that the write model performs no reads at all. We still need to read data out the database, load it into an object model so we can work effectively with it, then persist those changes back to the DB. It just means that the write model is optimised for write operations, while the query model is optimised for query operations. Your query model should never mutate state on the other hand.
-
-There are many ways to implement a CQRS based system. Some systems go to the extreme where the read and write models are stored in different data stores. While this makes sense in some use cases for the majority of us this creates a ton of unnecessary overhead and is best steered away from.
 
 For the sample we have implemented CQRS by having the write model work against the SQL tables using [Entity Framework Core][8]{:target="_blank"} and the read model based on SQL views using [Dapper][8]{:target="_blank"}.
 
