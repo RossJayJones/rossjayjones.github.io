@@ -548,7 +548,7 @@ public class GetCustomerVersionController : ControllerBase
 }
 {% endhighlight %}
 
-## Wrapping it up
+## Wrapping up
 
 I believe that SQL temporal tables is a great option for solving this specific problem. It stays out of your way when you don't need to think about it and provides powerful capabilities for dealing with point in time snapshots when you do.
 
