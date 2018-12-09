@@ -8,41 +8,21 @@ image:
 ---
 TLDR; [source code available on github][14]{:target="_blank"}
 
-Implementing versioning and audit trails within an application are one of those requirements which crop up over and over again, particularly in enterprise development. I work for OUTsurance in the insurance industry where reliable and accurate audit logs and version control are crucial.
+Inevitably when building enterprise software you will be required to implement audit trail and/or versioning functionality.
 
-The point of an audit log is to record changes to data so you can see who made the change, what was changed, when it was changed and in the best case why it was changed. In insurance for example updating details about the security devices installed in your vehicle could have an effect on the premiums you pay every month. Therefore it is important to record these change so there is a clear record of when and why that data was changed should there be an enquiry down the line.
+An audit trail is a record of change to your data which serves as proof of compliance with the applications business rules. It can be used to assist with identifying problems in your software and spotting fraudulent transactions among other things.
 
-Versioning is used to snapshot your data at a specific point in time such that each version can be referred to independently. For example there have been multiple versions of this blog post. There were a couple of drafts and ultimately a final version. When I shared this post with friends and colleagues it was useful to know which version they were looking at so I could consolidate the feedback effectively.
+Versioning involves assigning a version number to your data at a specific point in time. This allows data to be changed without breaking business process which relies on earlier versions of the data.
 
-At its core, versioning and audit trail solutions require the retrieval of data at a specific point in time (i.e. a point in time snapshot). This is the building block which a versioning and audit trail solution can be built from. In this post we are going to dive into how SQL temporal tables can be used to build such a solution.
+At their core, versioning and audit trails rely on point-in-time snapshots. I recently investigated different ways to implement this. I opted for a solution built with ASP.NET Core and SQL Server Temporal Tables. Here’s why, and how I implemented it.
 
-## The Problem Space
+## What I set out to do
 
-This is a hard problem to solve. The technical solution required for implementing point in time snapshots is complex and requires a lot of time and experience to implement well.
+### What I needed to build
 
-If your implementation is too fined grained you land up with a complex technical solution where your code is polluted with details associated with tracking changes on individual properties. i.e. the infamous `INotifyPropertyChanged` interface.
+I work for a South African insurance company. Because protecting sensitive personal data and preventing fraud are such key concerns to my company, our application needed reliable auditing. When data is changed, we need to be able to see: (i) who made change, (ii) what was changed, (iii) when it was changed and, ideally, (iv) why it was changed. In addition we need a mechanism to version the data to support complex business processes which rely on the data as it was at a specific point in time.
 
-If your implementation is too coarse you risk sacrificing system efficiency. For example you may be tempted to just serialize your entire object graph and store that as a JSON dump for every change which is made.
-
-Because it is difficult, and is often seen as a non functional requirement, we defer the implementation of these requirements until it is too late. The result is that we land up with a very technical solution which lacks the rich behaviour that the business requires. In the worst case we use software logging tools as an audit trail... you should be ashamed of yourselves :D
-
-Unfortunately the solution requires a little more upfront though to be truly useful. If you ask a product owner or domain expert about it, they will likely tell you that it is important. When asked what specifically should be audited/versioned the answer is well... _everything_.
-
-As frustrating as that answer is, sometimes it is the correct one. For the remainder of this post I will introduce [SQL Temporal Tables][13]{:target="_blank"} which is fantastic technical solution for solving the problem at the storage level. More importantly I will explain how to make these concepts first class concerns within your application using [CQRS][10]{:target="_blank"} and Domain [Driven Design][11]{:target="_blank"} which will provide the rich functionality that the business expects.
-
-### The Git Analogy
-
-Before we begin I just want to talk about a very good auditing and versioning system which as a developer you likely use everyday, and will hopefully solidify the concepts in your mind. 
-
-Git, at its core, is a database which records every change you make to your data as a commit. You can then get a copy of your data at any point in time (or commit). This provides a very good audit trail solution since for any change to the data you can see who did it, what was changed and when it was done. Git quite literally audits _everything_.
-
-You can think of a Git tag or release as a version. You can drop a marker at a specific point in time with a meaningful name. In the software development domain this would typically be a value such as `1.0.0`. This value can be used to communicate which version of the software your customers are using and help you control the roll out of updates to your software.
-
-### The Sample Business Domain
-
-For the sake of this post lets define a simple business domain which we will build a system which has full auditing and versioning functionality as described above.
-
-Our system will keep a registry of customers with a list of addresses per customer... an address book if you will :D
+Here is a simplified example of what we needed to build. Our system will keep a registry of customers with a list of delivery addresses per customer.
 
 ```
 +----------+         +----------+
@@ -52,28 +32,24 @@ Our system will keep a registry of customers with a list of addresses per custom
 +----------+         +----------+
 ```
 
-Any change to a customer or an associated address must be audited. For any given change the full state of the customer at that point in time must be retrievable via a REST API call.
+Any change to a customer or an associated address must be audited. For any given change the full state of the customer at that point in time must be retrievable via a REST API call. A change to customer means any of the following:
+
+A property on the customer is changed.
+An address is added or removed.
+A property on an address is changed.
 
 Separately we should be able to create a named version of a customer that can be retrieved via a REST API using the version number.
 
-A change to customer means any of the following:
+### Why was it difficult to do this
 
-* A property on the customer is changed
-* An address is added or removed
-* A property on an address is changed
+The technical solution required for implementing point in time snapshots is complex and requires a lot of time and experience to implement well - which is why this is a hard problem to solve.
 
-In this instance we have modeled the Customer as an Aggregate where the addresses are entities which belong to the aggregate.
+If your implementation is too fine-grained: You will land up with a complex technical solution where your code is polluted with details associated with tracking changes on individual properties, like the infamous `INotifyPropertyChanged` interface.
+If your implementation is too coarse: You risk sacrificing system efficiency. For example you may be tempted to just serialize your entire object graph and store that as a JSON dump for every change which is made.
 
-We are going to build an AspNetCore REST API which will support the above. I am only going to highlight the key aspects of the solution in this post and have omitted some of the mundane plumbing. Refer to the supporting [sample source code][14]{:target="_blank"} for a full view of the sample application.
+Because it is difficult, and is often seen as a non functional requirement, we defer the implementation of these requirements until it is too late. The result is that we land up with a very technical solution which lacks the rich behaviour that the business requires. In the worst case we use the output of development logging tools as an audit trail... you should be ashamed of yourselves! :D
 
-## The Solution Space
-
-We will approach the solution from two aspects:
-
-* We need a solid and unobtrusive technical solution to provide point in time snapshot capabilities
-* We need versioning and audit trails to be a first class citizen of our domain model. This is to allow us to interact with the audits and versions effectively.
-
-### Point in time snapshots
+## My options — and why I picked SQL Server Temporal Tables
 
 There are two solutions to point in time snapshots problem which require a mention.
 
@@ -81,9 +57,11 @@ There are two solutions to point in time snapshots problem which require a menti
 
 2. [Event Sourcing][4]{:target="_blank"} - Event Sourcing is an approach to storing state as a series of events. State is restored by replaying events in the order they occurred to materialize the latest state. To restore data to specific point in time you replay the events up to that point in time. Event sourcing requires a big shift in the way applications are built since events are at the core of the business data model. While this is a very powerful and relevant solution for some domains the facts are that it introduces complexity which feels unnecessary to most of us. Typically, solutions like this will work best with purpose-built infrastructure components such as [EventStore][5]{:target="_blank"}.
 
-[SQL temporal tables][7]{:target="_blank"} uses snapshots at the row level. When a row is updated a snapshot of the row is copied over to the associated history table. This gives us snapshot granularity at the row level which will be suitable for most use cases.
+We will implement a snapshot solution using [SQL temporal tables][7]{:target="_blank"}. It is a great point in time snapshot implementation which we can leverage with relatively little effort but does require some upfront design. It uses snapshots at the row level. When a row is updated a snapshot of the row is copied over to the associated history table. This gives us snapshot granularity at the row level which I believe is suitable for most use cases. SQL temporal tables take care of all the technical challenges of doing this and exposes the functionality with a few additional SQL statements.
 
-### CQRS and Domain Driven Design (DDD)
+## How I implemented SQL Server Temporal Tables
+
+While it would be possible to turn on the temporal tables and call it a day, there are some concepts which must be understood to allow auditing and versioning to be first class citizens of our business domain. This is necessary to unlock the rich functionality required and to achieve appropriate separation of concerns within the implementation.
 
 In the sample we will be using the Command Query Responsibility Segregation ([CQRS][10]{:target="_blank"}) pattern.
 
@@ -99,7 +77,7 @@ The second concept I need to highlight is Domain Driven Design ([DDD][11]{:targe
 
 > A DDD aggregate is a cluster of domain objects that can be treated as a single unit. An example may be an order and its line-items. These will be separate objects, but it's useful to treat the order (together with its line items) as a single aggregate. - [Fowler][11]{:target="_blank"}
 
-This is important in our context because we will be versioning and auditing the aggregate i.e. if any object within the aggregate changes, an audit will be created for the aggregate. When a new version is created it will be for the aggregate as a whole.
+This is important in our context because we will be versioning and auditing the aggregate i.e. if any object within the aggregate changes, an audit will be created for the aggregate. When a new version is created it will be for the aggregate as a whole. In our sample system we have one aggregate which is the customer.
 
 ### The Write Model
 
@@ -300,7 +278,7 @@ Up until this point we have done nothing out of the ordinary and have only used 
 
 The tables behind the domain objects described above have been set up in a specific way to make use of the SQL temporal table feature. The guidance on setting this up is well documented [here][13]{:target="_blank"} and I won't repeat the details.
 
-The jist is that you will need to setup a history table for every table which you require point in time snapshots for. When a value within a row changes the old row is moved into the history table and the update is applied to the row in the main table.
+The gist is that you will need to setup a history table for every table which you require a point in time snapshots for. When a value within a row changes the old row is moved into the history table and the update is applied to the row in the main table.
 
 Our aggregate is made up of a number of entities but when a change is made SQL will only _snapshot_ the data which has changed at the row level. This gives us an acceptable level of granularity for creating snapshots. You will need to be careful about what data you store in a given column. If you are storing huge JSON blobs in a column the history table could become unmanageable.
 
@@ -404,7 +382,7 @@ WHERE
 
 Our address book application exposes a REST API for our users to consume. Since the notable portions of the API are on the query side I will only show those controllers here. On the write side the controllers do as you would expect, they accept some data via a POST or PUT and update the data in the database via the domain model.
 
-Our user can retrieve a customer and view their associated addresses for an HTTP get to the following route. We provide an optional `auditId` parameter which will allow the users to retrieve the state of the customer for a specific audit.
+Our users can retrieve a customer and view their associated addresses via an HTTP GET to the following route. We provide an optional `auditId` parameter which will allow the users to retrieve the state of the customer for a specific audit.
 
 {% highlight C# %}
 [ApiController]
@@ -465,7 +443,7 @@ public class GetCustomerController : ControllerBase
 }
 {% endhighlight %}
 
-For versioning we provide a route which will return a list of available versions of the customer and separate route to retrieve the state of the customer for a specified version.
+For versioning we provide a route which will return a list of available versions of the customer and a separate route to retrieve the state of the customer for the specified version.
 
 {% highlight C# %}
 [ApiController]
@@ -555,6 +533,7 @@ I believe that SQL temporal tables is a great option for solving this specific p
 You can probably get 90% of the way there by enabling temporal tables as an afterthought, however hopefully I have shown that by thinking about these concepts up front when designing your domain model provides a lot of rich capabilities that your product owners and domain experts will love you for.
 
 If you want to dig a bit deeper into the solution checkout the full code sample for this post [here][14]{:target="_blank"}.
+References and resources
 
 [1]:https://en.wikipedia.org/wiki/Audit_trail
 [2]:https://en.wikipedia.org/wiki/Versioning
