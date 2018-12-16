@@ -95,13 +95,13 @@ I have setup the write model using Entity Framework Core. This is well documente
 
 Because the customer is an aggregate it can control its invariants via behaviour methods e.g. `AddAddress`, `UpdateAddress` etc. This is what gives us the hook to create a contextual audit record.
 
-When a behaviour method is called on the aggregate, it creates an `Audit` with a meaningful message e.g. "Address added" or "Address updated". Since multiple changes could occur in a single transaction, or unit of work, a single audit can contain multiple messages.
+When a behaviour method is called on the aggregate, it creates an `Audit` with a meaningful message e.g. "Address added" or "Address updated". Since multiple changes could occur in a single transaction, or unit of work, a single audit can contain multiple messages. This is analogous to a GIT commit.
 
 The audit is persisted with a `Timestamp` which we will use to query the temporal tables and retrieve a snapshot of the aggregate at that point in time.
 
 Because we have used DDD to model our domain objects we have an `Audit` object which  is used to reliably recall a list of changes for a given aggregate and view those changes in a human readable way. If we need to view the state of the aggregate at that point in time we can retrieve that _snapshot_ of the aggregate using an audit id.
 
-The exact same mechanism is used for versions. The subtle difference of course is that creating a new version requires an explicit call to `IncrementVersion` by user code. This is analogous to creating a GIT tag or release. 
+The exact same mechanism is used for versions. The subtle difference of course is that creating a new version requires an explicit call to `IncrementVersion` by user code. This is analogous to creating a GIT tag or release.
 
 As a result, we have an Audit and a Version as a first-class concept within our domain model which represented by the `Audit` and `Version` classes. In code our domain model appears as follows:
 
