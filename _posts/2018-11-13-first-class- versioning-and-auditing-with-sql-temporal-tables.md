@@ -34,20 +34,21 @@ For this article, let's look at a simplified example of what my team needed to b
 +----------+         +----------+
 ```
 
-For security purposes, any change to a customer or an associated address must be audited. Additionally, for any given change, the full state of the customer at that point in time must be retrievable via a [REST API][15]{:target="_blank"} call to be used by a front end or another services. A change to customer would mean any of the following:
+For security purposes, any change to a customer or an associated address must be audited. Additionally, for any given change, the full state of the customer at that point in time must be retrievable via a [REST API][15]{:target="_blank"} call to be used by a front end or another services. A change to a customer would mean any of the following:
 
-- A property on the customer is changed.
-- An address is added or removed.
-- A property on an address is changed.
+- A property on the customer is changed
+- An address is added or removed
+- A property on an address is changed
 
 Separately, to support business processes which rely on data at a specific point in time, we should be able to create a version of a customer that can be retrieved via a REST API using the version number.
 
 ## Why it was difficult to do this
 
-The technical solution required for implementing point-in-time snapshots is complex and requires a lot of time and experience to implement well - which is why this is a hard problem to solve.
+The technical solution required for implementing point-in-time snapshots is complex and requires a lot of time and experience to implement well.
 
-If your implementation is too fine-grained: You will land up with a complex technical solution where your code is polluted with details associated with tracking changes on individual properties, like the infamous `INotifyPropertyChanged` interface.
-If your implementation is too coarse: You risk sacrificing system efficiency. For example, you may be tempted to just serialize your entire object graph and store that as a JSON dump for every change which is made.
+*If your implementation is too fine-grained:* You will land up with a complex technical solution where your code is polluted with details associated with tracking changes on individual properties, like the infamous `INotifyPropertyChanged` interface.
+
+*If your implementation is too coarse:* You risk sacrificing system efficiency. For example, you may be tempted to just serialize your entire object graph and store that as a JSON dump for every change which is made.
 
 Because it is difficult, and is often seen as a non-functional requirement, we defer the implementation of these requirements until it is too late. The result is that we land up with a very technical solution which lacks the rich behaviour that the business requires. In the worst case, we use the output of development logging tools as an audit trail... You should be ashamed of yourselves! :D
 
