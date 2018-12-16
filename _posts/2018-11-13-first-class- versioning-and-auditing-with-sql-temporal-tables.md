@@ -87,7 +87,7 @@ Domain Driven Design ([DDD][11]{:target="_blank"}) is essentially a way of think
 
 > A DDD aggregate is a cluster of domain objects that can be treated as a single unit. An example may be an order and its line-items. These will be separate objects, but it's useful to treat the order (together with its line items) as a single aggregate. - [Fowler][11]{:target="_blank"}
 
-In our sample system we have one aggregate which is the customer. The DDD concept of an aggregate is important in this context because we will be versioning and auditing it. So, if any object within the aggregate changes or a new version is created, an snapshot will be created for the whole aggregate. 
+In our sample system we have one aggregate which is the customer. The DDD concept of an aggregate is important in this context because we will be versioning and auditing it. So, if any object within the aggregate changes or a new version is created, a snapshot will be created for the whole aggregate.
 
 ### Step 1: The write model
 
