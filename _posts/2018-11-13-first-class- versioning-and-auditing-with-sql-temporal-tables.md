@@ -9,14 +9,7 @@ image:
 
 Inevitably when building enterprise software you will be required to implement audit trail and/or versioning functionality. At its core, versioning and audit trails rely on point-in-time snapshots. My team and I recently investigated different ways to implement this. We opted for a solution built with ASP.NET Core and SQL Server Temporal Tables. Here’s why, and how we implemented it.
 
-An audit trail is a record of change to your data which serves as proof of compliance with the applications business rules. It can be used to assist with identifying problems in your software and spotting fraudulent transactions among other things.
-
-Versioning involves assigning a version number to your data at a specific point in time. This allows data to be changed without breaking business process which relies on earlier versions of the data.
-
-
-## What we set out to do
-
-### What we needed to build
+## What we needed to build
 
 I work as a developer for a South African insurance company. Since protecting sensitive personal data and preventing fraud are such key concerns to my company, our core insurance system needed reliable auditing. When data is changed, we needed to be able to see: 
 
@@ -37,15 +30,19 @@ For this article, let's look at a simplified example of what my team needed to b
 +----------+         +----------+
 ```
 
-For security purposes, any change to a customer or an associated address must be audited. Additionally, for any given change, the full state of the customer at that point in time must be retrievable via a [REST API][15]{:target="_blank"} call to be used by a front end or other services. A change to customer would mean any of the following:
+For security purposes, any change to a customer or an associated address must be audited. Additionally, for any given change, the full state of the customer at that point in time must be retrievable via a [REST API][15]{:target="_blank"} call to be used by a front end or another services. A change to customer would mean any of the following:
 
 - A property on the customer is changed.
 - An address is added or removed.
 - A property on an address is changed.
 
-Separately, to support business processes which rely on data at a specific point in time, we should be able to create a named version of a customer that can be retrieved via a REST API using the version number.
+> An audit trail is a record of change to your data which serves as proof of compliance with the applications business rules. It can be used to assist with identifying problems in your software and spotting fraudulent transactions among other things.
 
-### Why it was difficult to do this
+Separately, to support business processes which rely on data at a specific point in time, we should be able to create a version of a customer that can be retrieved via a REST API using the version number.
+
+> Versioning involves assigning a version number to your data at a specific point in time. This allows data to be changed without breaking business process which relies on earlier versions of the data.
+
+## Why it was difficult to do this
 
 The technical solution required for implementing point-in-time snapshots is complex and requires a lot of time and experience to implement well - which is why this is a hard problem to solve.
 
@@ -54,7 +51,7 @@ If your implementation is too coarse: You risk sacrificing system efficiency. Fo
 
 Because it is difficult, and is often seen as a non-functional requirement, we defer the implementation of these requirements until it is too late. The result is that we land up with a very technical solution which lacks the rich behaviour that the business requires. In the worst case, we use the output of development logging tools as an audit trail... You should be ashamed of yourselves! :D
 
-## My options — and why we picked SQL Server Temporal Tables
+## Our options — and why we picked SQL Server Temporal Tables
 
 There are two solutions to the point-in-time snapshots problem which require a mention.
 
