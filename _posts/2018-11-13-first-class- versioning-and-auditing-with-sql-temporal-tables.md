@@ -11,14 +11,18 @@ Inevitably when building enterprise software you will be required to implement a
 
 ## What we needed to build
 
-I work as a developer for a South African insurance company. Since protecting sensitive personal data and preventing fraud are such key concerns to my company, our core insurance system needed reliable auditing. When data is changed, we needed to be able to see: 
+I work as a developer for a South African insurance company. Since protecting sensitive personal data and preventing fraud are such key concerns to my company, our core insurance system needed reliable auditing. When data is changed, we needed to be able to see:
 
-- Who made change, 
-- What was changed, 
-- When it was changed and, 
-- Why it was changed. 
+- Who made the change
+- What was changed
+- When it was changed and
+- Why it was changed
+
+> An audit trail is a record of change to your data which serves as proof of compliance with the applications business rules. It can be used to assist with identifying problems in your software and spotting fraudulent transactions among other things.
 
 In addition, we needed a mechanism to version the data so that we could support complex business processes which rely on the data at specific points in time.
+
+> Versioning involves assigning a version number to your data at a specific point in time. This allows data to be changed without breaking business process which relies on earlier versions of the data.
 
 For this article, let's look at a simplified example of what my team needed to build. Our sample system will keep a registry of customers along with a list of addresses for properties they need to insure.
 
@@ -36,11 +40,7 @@ For security purposes, any change to a customer or an associated address must be
 - An address is added or removed.
 - A property on an address is changed.
 
-> An audit trail is a record of change to your data which serves as proof of compliance with the applications business rules. It can be used to assist with identifying problems in your software and spotting fraudulent transactions among other things.
-
 Separately, to support business processes which rely on data at a specific point in time, we should be able to create a version of a customer that can be retrieved via a REST API using the version number.
-
-> Versioning involves assigning a version number to your data at a specific point in time. This allows data to be changed without breaking business process which relies on earlier versions of the data.
 
 ## Why it was difficult to do this
 
