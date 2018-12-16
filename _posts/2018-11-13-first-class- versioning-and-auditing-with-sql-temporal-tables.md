@@ -95,7 +95,7 @@ I have setup the write model using Entity Framework Core. This is well documente
 
 Because the customer is an aggregate it can control its invariants via behaviour methods e.g. `AddAddress`, `UpdateAddress` etc. This is what gives us the hook to create a contextual audit record.
 
-When a behaviour method is called on the aggregate, it creates an `Audit` with a meaningful message e.g. "Address added" or "Address updated". Since multiple changes could occur in a single transaction, or unit of work, a single audit can contain multiple messages. This is analogous to a GIT commit message.
+When a behaviour method is called on the aggregate, it creates an `Audit` with a meaningful message e.g. "Address added" or "Address updated". Since multiple changes could occur in a single transaction, or unit of work, a single audit can contain multiple messages.
 
 The audit is persisted with a `Timestamp` which we will use to query the temporal tables and retrieve a snapshot of the aggregate at that point in time.
 
