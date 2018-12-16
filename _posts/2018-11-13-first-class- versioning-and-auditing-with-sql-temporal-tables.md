@@ -103,7 +103,9 @@ Because we have used DDD to model our domain objects we have an `Audit` object w
 
 The exact same mechanism is used for versions. The subtle difference of course is that creating a new version requires an explicit call to `IncrementVersion` by user code. This is analogous to creating a GIT tag or release.
 
-As a result, we have an Audit and a Version as a first-class concept within our domain model which represented by the `Audit` and `Version` classes. In code our domain model appears as follows:
+As a result, we have an Audit and a Version as a first-class concept within our domain model which represented by the `Audit` and `Version` classes, but are not bogged down with any point-in-time snapshot technical complexity.
+
+In code our domain model appears as follows:
 
 {% highlight C# %}
 public class Customer
