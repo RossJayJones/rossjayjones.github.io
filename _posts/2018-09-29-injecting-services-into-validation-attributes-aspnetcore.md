@@ -20,7 +20,7 @@ Out of the box the System.Component model validation attribute provides a way to
 
 A great post by [Andrew Lock](https://andrewlock.net/injecting-services-into-validationattributes-in-asp-net-core/){:target="_blank"} got us most of the way there however this method does not allow for asynchronous operations and prevented us meeting the first requirement.
 
-We invesitgated using `Filters` however the filter pipeline is executed after model binding and validation takes place which prevented us from meeting requirement 2 and 3.
+We invesitgated using `Filters` however the filter pipeline is executed after model binding and validation takes place. This would prevent us from meeting requirement 2 and 3.
 
 We dug into the AspNetCore code base and found that intercepting the model binding step was possible and would give us what we needed.
 
@@ -90,7 +90,7 @@ public class CustomValidationModelBinderProvider : IModelBinderProvider
 To hook this up to the Mvc framework we can create an extension method to be called by the Startup.cs class.
 
 {% highlight C# %}
-public static void UseRiskDataModelBindingProvider(this MvcOptions opts)
+public static void UseCustomValidationModelBindingProvider(this MvcOptions opts)
 {
   var underlyingModelBinder = opts.ModelBinderProviders.FirstOrDefault(x => x.GetType() == typeof(BodyModelBinderProvider));
 
@@ -121,7 +121,7 @@ We still need to get the additional data to the validation attributes. To achiev
 
 For this example, when given a model which contains a name and a list of items, we want to be sure that those values are contained within some pre-defined data stored away in a database or service.
 
-Then given a model which looks like this
+Given a model which appears as follows
 
 {% highlight C# %}
 public class ValuesModel
@@ -156,7 +156,7 @@ public class CustomValidationContext
 
 ### Validation Context Provider
 
-The provider is simply a class which provides acess to the validation context instance. It could be implemented as follows.
+The provider is simply a class which provides access to the validation context instance. It could be implemented as follows.
 
 {% highlight C# %}
 public class CustomValidationContextProvider
@@ -190,7 +190,7 @@ public class CustomValidationContextProvider
 
 ### Fetching the data
 
-We need a way to fetch the data for our custom validation. This can be done using a DbContext or a service call. For this example we have created a simple validation context factory for brevity. This does nothing but return some sample data using async/await immediately fulfilled task.
+We need a way to fetch the data for our custom validation. This can be done using a DbContext or a service call. For this example we have created a simple validation context factory for brevity. This does nothing but return some sample data using an immediately fulfilled task.
 
 {% highlight C# %}
 public class CustomValidationContextFactory
@@ -267,7 +267,7 @@ public class CustomValidationModelBinder : IModelBinder
 
 ## Custom Validation Attributes
 
-For convenience we can create a base class which is responsible for fishing out the CustomValidationContextProvider to get hold of the CustomValidationContext instance and make it available within the IsValid method of the validation attribute.
+For convenience we can create a base class which is responsible for locating the CustomValidationContextProvider to get hold of the CustomValidationContext instance and make it available within the IsValid method of the validation attribute.
 
 {% highlight C# %}
 public abstract class CustomValidationBaseAttribute : ValidationAttribute
