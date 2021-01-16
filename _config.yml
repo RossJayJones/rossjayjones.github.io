@@ -41,3 +41,5 @@ paginate: 5
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+include: [".well-known"]
